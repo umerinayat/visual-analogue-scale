@@ -1,0 +1,239 @@
+<div class="container mt-4">
+
+    <div class="row">
+        <div class="col-sm-12 text-center">
+            <h4 class="text-muted">RATING OF OVERALL STUDY EFFECT</h4>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-sm-12">
+            <span id="score" style="color:blue" class="display-4">Score</span>
+        </div>
+    </div>
+
+  
+    <div class="row text-center">
+        <div class="col-sm-12">
+            <span style="color:blue"> (<b id="category">Category</b>) </span>
+        </div>
+    </div>
+
+
+    <!-- <div class="row text-center mt-4">
+        <div class="col-sm-2  bg-info text-white vas-border offset-sm-1">
+            Large <sup>-ve</sup>
+        </div>
+        <div class="col-sm-2 bg-success text-white vas-border">
+            Moderate <sup>-ve</sup>
+        </div>
+        <div class="col-sm-1 bg-primary text-white vas-border">
+            Small <sup>-ve</sup>
+        </div>
+        <div class="col-sm-1 bg-danger text-white vas-border">
+            None
+        </div>
+        <div class="col-sm-1  bg-primary text-white vas-border">
+            Small <sup>+ve</sup> 
+        </div>
+        <div class="col-sm-2 bg-success text-white vas-border">
+            Moderate <sup>+ve</sup> 
+        </div>
+        <div class="col-sm-2 vas-border bg-info text-white">
+            Large <sup>+ve</sup> 
+        </div>
+    </div> -->
+
+
+    <div class="row m-0 p-0 mt-4">
+        <div class="col-sm-12 m-0 p-0">
+            <ul class="visual-scale">
+                <li class="visual-category bg-info">Large <sup>-ve</sup></li>
+                <li class="visual-category  bg-success">Moderate <sup>-ve</sup></li>
+                <li class="visual-category bg-primary">Small <sup>-ve</sup></li>
+                <li class="visual-category bg-danger">None</li>
+                <li class="visual-category bg-primary">Small <sup>+ve</sup></li>
+                <li class="visual-category bg-success">Moderate <sup>+ve</sup></li>
+                <li class="visual-category bg-info">Large <sup>+ve</sup> </li>
+            </ul>
+            
+        </div>
+
+    </div>
+
+
+    <div class="row text-center mt-3 mb-4">
+        <div class="col-sm-12">
+            
+            <div id="slider"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 offset-sm-1">
+            <label for="selected-result"><b>Selected Result:</b> <em><strong class="ml-2" style="color:blue">Article 1</strong></em></label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3 offset-sm-1">
+
+            <div class="form-group row">
+                <div class="col-sm-8 mt-1">
+                    <label for="noOfResults" class="mr-2"><b>Number of results:</b> </label>
+                </div>
+                <div class="col-sm-4">
+                    <input class="form-control" type="number" id="noOfResults" value="1" style="width:80px" min="1"/>
+                </div>
+            
+            </div>
+        </div>
+        <div class="col-sm-6 offset-sm-2">
+            <div class="form-group row ">
+                <div class="col-sm-4 mt-1">
+                    <label for="search-result" class="mr-2"><b>Search for result:</b> </label>
+                    
+                </div>
+                <div class="col-sm-6">
+                    <input class="form-control" type="search" id="search-result">
+                    
+                </div>
+                <div class="col-sm-2 p-0">
+                    <button class="btn btn-outline-dark">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+
+        <div class="col-sm-12  text-center">
+            
+            <div id='my-spreadsheet'></div>
+            
+            
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    $(function() {
+
+        var $score = $('#score');
+        var $category = $('#category');
+        var $slider = $('#slider');
+
+        var pixleCount = 0;
+
+        $slider.slider({
+            min: -3.50,
+            max: 3.50,
+            step: 0.01,
+            value: 0,
+            slide: function (event, ui) {
+                
+                $score.text(ui.value);
+                ++pixleCount;
+
+                if ( ui.value >= -3.50 && ui.value <= -2.51) 
+                {
+                    $category.text('Large Negative Effect');
+                }
+                else if ( ui.value >= -2.50 && ui.value <= -1.51) 
+                {
+                    $category.text('Moderate Negative Effect');
+                }
+                else if ( ui.value >= -1.50 && ui.value <= -0.51) 
+                {
+                    $category.text('Small Negative Effect');
+                }
+                else if ( ui.value >= -0.50 && ui.value <=  0.50) 
+                {
+                    $category.text('No Effect');
+                } 
+                else if ( ui.value >= 0.51 && ui.value <=  1.50 ) 
+                {
+                    $category.text('Small Positive Effect');
+                    console.log(pixleCount);
+                }
+                else if ( ui.value >= 1.51 && ui.value <=  2.50 ) 
+                {
+                    $category.text('Moderate Positive Effect');
+                } 
+                else if ( ui.value >= 2.51 && ui.value <=  3.50 ) 
+                {
+                    $category.text('Large Positive Effect');
+                }
+
+                
+
+            }
+        });
+
+
+    });
+
+</script>
+
+
+<script>
+    data = [
+        ['', , ,''],
+    ];
+    
+    var table1 = jexcel(document.getElementById('my-spreadsheet'), {
+        data:data,
+        columns:[
+            { title:'Article', width:250 },
+            { title:'Score', width:100 },
+            { title:'Category', width:100 },
+            { title:'Category Description', width:250 }
+        ]
+    });
+
+    if ( 10  < 9 ){
+        console.log("test");
+    }
+  
+    var rowCount = 1;
+    var oldRowCount = 1;
+
+    var $noOfResults = $('#noOfResults');
+    $noOfResults.on('change', function(evt){
+        if ( $noOfResults.val() < 1 ) {
+            $noOfResults.val(oldRowCount);
+            return;
+        }
+
+        if ($noOfResults.val() > 1000 ) {
+            $noOfResults.val(oldRowCount);
+            return;
+        }
+
+        console.log($noOfResults.val())
+        console.log(oldRowCount)
+
+
+        if (parseInt($noOfResults.val()) <  oldRowCount) {
+             // delete the first row from the table
+             console.log('isdleted');
+            table1.deleteRow($noOfResults.val(), $noOfResults.val() + 1);
+        } else {
+             // insert new row at the end of the table
+            
+            table1.insertRow(parseInt($noOfResults.val()) - oldRowCount , oldRowCount);
+            
+            
+        }
+
+        
+        oldRowCount = parseInt($noOfResults.val());
+        
+    }); 
+
+</script>
