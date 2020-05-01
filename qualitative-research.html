@@ -50,20 +50,25 @@
     </div>
 
   
-
-   
-
     <div class="row mt-4">
-
         <div class="col-sm-12  text-center">
-            
             <div id='my-spreadsheet'></div>
             <div id="log"></div>
-            
-            
-
         </div>
+    </div>
 
+    <div class="row">
+        <div class="col-sm-12">
+            <button id="exportCsvBtn" class="btn btn-sm btn-outline-info">Export as CSV</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-sm-12">
+            <label for="csvFile" class="import-csv-label">Import from CSV file.</label>
+            <input style="display: none;" id="csvFile" type="file">
+           
+        </div>
     </div>
 
 </div>
@@ -73,18 +78,46 @@
 
     $(function() {
 
-        mySpreadsheet = null;
+        // Dom Elements Refs
+        var $mySpreadsheetDiv = $('#my-spreadsheet');
         $selectedResult = $('#selectedResult');
         var $score = $('#score');
         var $category = $('#category');
         var $slider = $('#slider');
-        currentRow = null;
-        var pixleCount = 0;
+        var $exportCsvBtn = $('#exportCsvBtn');
+      
+        var $csvFile = $('#csvFile');
 
+        // jexcel related vars
+        mySpreadsheet = null;
+        isMySpreadsheetLoaded = false;
+        currentRow = null;
+        csvFilePath = '';
+
+        // mySpreadsheet Events
+        mySpreadsheetLoaded = function () {
+            isMySpreadsheetLoaded = true;
+        }
+        selectionActive = function(instance, x1, y1, x2, y2, origin) {
+            var cellName1 = jexcel.getColumnNameFromId([x1, y1]);
+            var cellName2 = jexcel.getColumnNameFromId([x2, y2]);
+            console.log(instance);
+            console.log(mySpreadsheet.selectedRow);
+            //console.log(mySpreadsheet.selectedCell);
+            if ( mySpreadsheet.selectedRow != null ) {
+                
+                currentRow = mySpreadsheet.selectedRow; 
+                if (currentRow && currentRow >=0) {
+                    var rowData = mySpreadsheet.getRowData(currentRow);
+                    $selectedResult.text(rowData[0]);
+                }
+            } 
+        };
+
+        // create mySpreadsheet functions
         loadFromCsv = function ( path ) {
             mySpreadsheet = jexcel(document.getElementById('my-spreadsheet'), {
                 csv: path,
-                
                 csvHeaders:true,
                 tableOverflow:true,
                 csvFileName: 'Articles',
@@ -98,16 +131,32 @@
                     { type:'text', width:300 },
                 ],
                 onselection: selectionActive,
-                onload: function () {
-                    //console.log(mySpreadsheet.download(true));
-                    //console.log('test');
-                }
+                onload: mySpreadsheetLoaded,
             });
 
             
         }
 
-     
+        makeFresh = function () {
+            mySpreadsheet = jexcel(document.getElementById('my-spreadsheet'), {
+                data:data,
+                csvHeaders:true,
+                tableOverflow:true,
+                csvFileName: 'Articles',
+                search:true,
+                pagination:10,
+                paginationOptions:[10,25,50,100],
+                columns:[
+                    { title:'Article', width:250 },
+                    { title:'Score', width:100 },
+                    { title:'Category', width:250 },
+                    { title:'Category Description', width:250 }
+                ],
+                onselection: selectionActive,
+                onload: mySpreadsheetLoaded,
+            });
+        }
+
 
         $slider.slider({
             min: -3.50,
@@ -117,7 +166,7 @@
             slide: function (event, ui) {
                 
                 $score.text(ui.value);
-                ++pixleCount;
+               
 
                 if (currentRow && currentRow >=0) {
                     
@@ -172,7 +221,7 @@
                         $selectedResult.text(rowData[0]);
                     }
                     
-                    console.log(pixleCount);
+                    
                 }
                 else if ( ui.value >= 1.51 && ui.value <=  2.50 ) 
                 {
@@ -202,6 +251,41 @@
             }
         });
 
+        // Handling DOM Events
+        $exportCsvBtn.on('click', function (evt) {
+            if ( mySpreadsheet ) {
+                if ( isMySpreadsheetLoaded ) {
+                    mySpreadsheet.download(true);
+                }
+            }
+        });
+
+        var reader = new FileReader();
+        $csvFile.on('change', function (event) {
+            console.log($csvFile.val());
+            csvFilePath = $csvFile.val();
+
+            csvFile= this.files[0];
+
+            if (csvFile) {
+                reader.readAsText(csvFile, "UTF-8")
+                reader.onload = function (evt) {
+                updatedData = $.csv.toArrays(evt.target.result)
+                mySpreadsheet = null;
+                data = [];
+                $mySpreadsheetDiv.empty();
+                makeFresh();
+                
+                var headers = updatedData.shift();
+                $('#my-spreadsheet').jexcel('setData',updatedData, false);
+                }
+            }
+        }); 
+
+      
+
+
+
 
     });
 
@@ -210,39 +294,13 @@
         ['', , ,''],
     ];
 
-    
 
-    var selectionActive = function(instance, x1, y1, x2, y2, origin) {
-        var cellName1 = jexcel.getColumnNameFromId([x1, y1]);
-        var cellName2 = jexcel.getColumnNameFromId([x2, y2]);
-        console.log(instance);
-        console.log(mySpreadsheet.selectedRow);
-        //console.log(mySpreadsheet.selectedCell);
-        if ( mySpreadsheet.selectedRow != null ) {
-            
-            currentRow = mySpreadsheet.selectedRow; 
-            if (currentRow && currentRow >=0) {
-                var rowData = mySpreadsheet.getRowData(currentRow);
-                $selectedResult.text(rowData[0]);
-            }
-            
-        } 
-        
-        //$('#log').append('The selection from ' + cellName1 + ' to ' + cellName2 + '');
-    };
-    
-    // mySpreadsheet = jexcel(document.getElementById('my-spreadsheet'), {
-    //     data:data,
-    //     columns:[
-    //         { title:'Article', width:250 },
-    //         { title:'Score', width:100 },
-    //         { title:'Category', width:250 },
-    //         { title:'Category Description', width:250 }
-    //     ],
-    //     onselection: selectionActive,
-    // });
+  
 
-    loadFromCsv('data/articles.csv');
+    //loadFromCsv('data/articles.csv');
+    makeFresh();
+
+   
 
     if ( 10  < 9 ){
         console.log("test");
