@@ -1,0 +1,27 @@
+<html>
+<script src="https://jexcel.net/v5/jexcel.js"></script>
+<script src="https://jexcel.net/v5/jsuites.js"></script>
+<link rel="stylesheet" href="https://jexcel.net/v5/jexcel.css" type="text/css" />
+<link rel="stylesheet" href="https://jexcel.net/v5/jsuites.css" type="text/css" />
+ 
+ 
+<div id="spreadsheet"></div>
+ 
+<script>
+ jexcel(document.getElementById('spreadsheet'), {
+    csv:'data/articles.csv',
+    csvHeaders:true,
+    search:true,
+    pagination:10,
+    paginationOptions:[10,25,50,100],
+    columns: [
+        { type:'text', width:80 },
+        { type:'text', width:200 },
+        { type:'text', width:100 },
+        { type:'text', width:200 },
+        { type:'text', width:100 },
+    ],
+    license: '39130-64ebc-bd98e-26bc4',
+});
+</script>
+</html>
