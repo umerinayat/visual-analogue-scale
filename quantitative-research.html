@@ -1,1 +1,150 @@
-<h3>Quantitative Research</h3>
+<div class="container mt-4">
+
+
+    <div class="row mt-4">
+        <div class="col-sm-12  text-center">
+            <div id='quant-spreadsheet'></div>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <button id="exportCsvBtn" class="btn btn-sm btn-outline-info">Export as CSV</button>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-sm-12">
+            <label for="csvFile" class="import-csv-label">Import from CSV file.</label>
+            <input style="display: none;" id="csvFile" type="file">
+           
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 text-right">
+            <button class="btn btn-outline-success">Generate Statistics</button>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+    $(function() {
+
+        // Dom Elements Refs
+        var $quantSpreadsheetDiv = $('#quant-spreadsheet');
+        $selectedResult = $('#selectedResult');
+        var $exportCsvBtn = $('#exportCsvBtn');
+      
+        var $csvFile = $('#csvFile');
+
+        // jexcel related vars
+        mySpreadsheet = null;
+        isMySpreadsheetLoaded = false;
+        csvFilePath = '';
+
+        // mySpreadsheet Events
+        mySpreadsheetLoaded = function () {
+            isMySpreadsheetLoaded = true;
+        }
+        selectionActive = function(instance, x1, y1, x2, y2, origin) {
+            var cellName1 = jexcel.getColumnNameFromId([x1, y1]);
+            var cellName2 = jexcel.getColumnNameFromId([x2, y2]);
+            console.log(instance);
+            console.log(mySpreadsheet.selectedRow);
+        };
+
+        // create mySpreadsheet functions
+        loadFromCsv = function ( path ) {
+            mySpreadsheet = jexcel(document.getElementById('quant-spreadsheet'), {
+                csv: path,
+                csvHeaders:true,
+                tableOverflow:true,
+                csvFileName: 'Articles',
+                search:true,
+                pagination:10,
+                paginationOptions:[10,25,50,100],
+                columns: [
+                    { type:'text', width:250 },
+                    { type:"text", width:100 },
+                    { type:'text', width:250 },
+                    { type:'text', width:250 },
+                    { type:'text', width:250 },
+                    { type:'text', width:250 }
+                ],
+                onselection: selectionActive,
+                onload: mySpreadsheetLoaded,
+            });
+
+            
+        }
+
+        makeFresh = function () {
+            mySpreadsheet = jexcel(document.getElementById('quant-spreadsheet'), {
+                data:data,
+                csvHeaders:true,
+                tableOverflow:true,
+                csvFileName: 'Articles',
+                search:true,
+                pagination:10,
+                paginationOptions:[10,25,50,100],
+                columns:[
+                    { title:'Article', width:250 },
+                    { title:"Cohen's d", width:100 },
+                    { title:'Correlation', width:100 },
+                    { title:'Percentage', width:100 },
+                    { title:'T-Score', width:100 },
+                    { title:'Z-Score', width:100 }
+                ],
+                onselection: selectionActive,
+                onload: mySpreadsheetLoaded,
+            });
+        }
+
+        // Handling DOM Events
+        $exportCsvBtn.on('click', function (evt) {
+            if ( mySpreadsheet ) {
+                if ( isMySpreadsheetLoaded ) {
+                    mySpreadsheet.download(true);
+                }
+            }
+        });
+
+        var reader = new FileReader();
+        $csvFile.on('change', function (event) {
+            console.log($csvFile.val());
+            csvFilePath = $csvFile.val();
+
+            csvFile= this.files[0];
+
+            if (csvFile) {
+                reader.readAsText(csvFile, "UTF-8")
+                reader.onload = function (evt) {
+                updatedData = $.csv.toArrays(evt.target.result)
+                mySpreadsheet = null;
+                data = [];
+                $quantSpreadsheetDiv.empty();
+                makeFresh();
+                
+                var headers = updatedData.shift();
+                $('#quant-spreadsheet').jexcel('setData',updatedData, false);
+                }
+            }
+        }); 
+    });
+
+
+    data = [
+        ['a','b','c','d', 'e'],
+    ];
+
+    
+    makeFresh();
+
+
+
+</script>
