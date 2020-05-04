@@ -10,7 +10,7 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <button id="exportCsvBtn" class="btn btn-sm btn-outline-info">Export as CSV</button>
+            <button id="exportQuantCsvBtn" class="btn btn-sm btn-outline-info">Export as CSV</button>
         </div>
     </div>
 
@@ -38,7 +38,7 @@
         // Dom Elements Refs
         var $quantSpreadsheetDiv = $('#quant-spreadsheet');
         $selectedResult = $('#selectedResult');
-        var $exportCsvBtn = $('#exportCsvBtn');
+        var $exportQuantCsvBtn = $('#exportQuantCsvBtn');
       
         var $csvFile = $('#csvFile');
 
@@ -88,7 +88,7 @@
                 data:data,
                 csvHeaders:true,
                 tableOverflow:true,
-                csvFileName: 'Articles',
+                csvFileName: 'QuantitativeResearch',
                 search:true,
                 pagination:10,
                 paginationOptions:[10,25,50,100],
@@ -106,8 +106,10 @@
         }
 
         // Handling DOM Events
-        $exportCsvBtn.on('click', function (evt) {
+        $exportQuantCsvBtn.on('click', function (evt) {
+            
             if ( mySpreadsheet ) {
+                
                 if ( isMySpreadsheetLoaded ) {
                     mySpreadsheet.download(true);
                 }
@@ -139,7 +141,7 @@
 
 
     data = [
-        ['a','b','c','d', 'e'],
+        ['a','b','c','d', 'e', 'f'],
     ];
 
     
