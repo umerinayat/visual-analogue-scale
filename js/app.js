@@ -284,7 +284,7 @@ $(function () {
     $quallRCheck = $('#quallRCheck');
     isquallRExport = false;
 
-    $quntRCheck = $('#quallRCheck');
+    $quntRCheck = $('#quntRCheck');
     isquntRExport = false;
 
     var exportCsvFiles = function (event) {
